@@ -1,0 +1,10 @@
+*~
+*.pyc
+.idea
+.coverage
+*.egg-info/
+dist/
+.tox/
+.DS_Store
+.build.log
+build/

@@ -1,0 +1,6 @@
+-r requirements.txt
+pep8
+pre-commit
+pyflakes
+pytest-cov
+pytest
