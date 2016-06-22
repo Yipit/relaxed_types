@@ -29,8 +29,10 @@ def parse_requirements():
 
     return pkgs, links
 
+
 def local_file(f):
     return open(os.path.join(os.path.dirname(__file__), f)).read()
+
 
 install_requires, dependency_links = parse_requirements()
 
@@ -40,7 +42,7 @@ if __name__ == '__main__':
         name="relaxed_types",
         version='0.0.1',
         description="relaxed_types",
-        long_description=local_file('README.md'),
+        long_description=local_file('README.rst'),
         author='Yipit Coders',
         author_email='coders@yipit.com',
         url='https://github.com/Yipit/relaxed_types',
