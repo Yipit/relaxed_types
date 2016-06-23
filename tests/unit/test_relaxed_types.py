@@ -1,6 +1,7 @@
 import pytest
 
 from relaxed_types import typed_return, ReturnTypeError, Any
+from relaxed_types.types import MinLength, Range, Contains, RegExpPattern
 
 
 def test_typed_return_with_simple_types():
@@ -272,5 +273,79 @@ def test_typed_return_with_literal_sets():
     def invalid1():
         return {"a", 1.0}
 
+    valid1()
+    pytest.raises(ReturnTypeError, invalid1)
+
+
+def test_min_length():
+    decorator = typed_return(str, MinLength(10))
+
+    @decorator
+    def valid1():
+        return 'a' * 11
+
+    @decorator
+    def invalid1():
+        return 'a'
+
+    valid1()
+    pytest.raises(ReturnTypeError, invalid1)
+
+
+def test_multiple_types():
+    decorator = typed_return(str, MinLength(10), Contains('c'))
+
+    @decorator
+    def valid1():
+        return 'a' * 11 + 'c'
+
+    @decorator
+    def invalid1():
+        return 'a' * 11
+
+    @decorator
+    def invalid2():
+        return 'a'
+
+    valid1()
+    pytest.raises(ReturnTypeError, invalid1)
+    pytest.raises(ReturnTypeError, invalid2)
+
+
+def test_range():
+    decorator = typed_return(basestring, Range(1, 5))
+
+    @decorator
+    def valid1():
+        return 'a'
+
+    @decorator
+    def valid2():
+        return 'abcde'
+
+    @decorator
+    def invalid1():
+        return ''
+
+    @decorator
+    def invalid2():
+        return 'abcdef'
+
+    valid1()
+    valid2()
+    pytest.raises(ReturnTypeError, invalid1)
+    pytest.raises(ReturnTypeError, invalid2)
+
+
+def test_regexp():
+    decorator = typed_return(basestring, RegExpPattern("abc"))
+
+    @decorator
+    def valid1():
+        return 'xx abc yy'
+
+    @decorator
+    def invalid1():
+        return 'xaby'
     valid1()
     pytest.raises(ReturnTypeError, invalid1)
