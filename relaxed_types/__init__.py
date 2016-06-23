@@ -24,21 +24,14 @@ def check_type(value, expected_type, outer_value, extra=None):
             fail(value, expected_type, outer_value)
 
         if Any in expected_type:
-            expected = expected_type.copy()
-            unspecified_key_type = expected.pop(Any)
-            for key_name, key_type in expected.items():
-                check_type(value[key_name], key_type, outer_value)
-
-            missing_keys = set(value.keys()) - set(expected.keys())
-            for key_name in missing_keys:
-                check_type(value[key_name], unspecified_key_type, outer_value)
+            unspecified_type = expected_type[Any]
+            for key_name in value.keys():
+                check_type(value[key_name], expected_type.get(key_name, unspecified_type), outer_value)
         else:
-            # all key names must match at this point
             if set(expected_type.keys()) != set(value.keys()):
                 fail(value, expected_type, outer_value)
-
-            for key_name, key_type in expected_type.items():
-                check_type(value[key_name], key_type, outer_value)
+            for key_name in expected_type.keys():
+                check_type(value[key_name], expected_type[key_name], outer_value)
 
     elif isinstance(expected_type, tuple):
         if not isinstance(value, tuple):
