@@ -66,7 +66,7 @@ Different from lists, tuples have a fixed size. The tuple specification length h
 Dictionaries
 ++++++++++++
 
-It is possible to specify the expected types for dictionary key values. The specification has the minimum value necessary to match a dictionary.
+It is possible to specify the expected types for dictionary key values. All keys specified must exist in the dictionary —- the value ``Any`` can be specified as a key in order to validate additional keys.
 
 
 .. code:: python
@@ -82,6 +82,20 @@ It is possible to specify the expected types for dictionary key values. The spec
     Traceback (most recent call last):
       ...
     relaxed_types.ReturnTypeError: Type mismatch for '47', expected <type 'int'>. Outer value: {'test': 'test', 'age': '47', 'name': 'Guy'}
+
+
+
+The following example shows how to specify a dictionary with key ``name`` as ``str`` and any other key as ``int``.
+
+.. code:: python
+
+    >>> from relaxed_types import *
+    >>> @typed_return({"name": str, Any: int})
+    ... def func(x):
+    ...     return x
+    ...
+    >>> func({"name": "John Doe", "b": 2, "c": 3})
+    {"name": "John Doe", "b": 2, "c": 3}
 
 
 
@@ -176,5 +190,18 @@ It's possible to combine lists, tuples, dictionaries, predicates, and any Python
     Traceback (most recent call last):
       ...
     relaxed_types.ReturnTypeError: Type mismatch for 'test', expected <function <lambda> at 0x10e325758>. Outer value: [{'name': 'test'}]
+
+
+    >>> @typed_return([{"data": Any, "id": lambda x: isinstance(x, int) and x > 0}])
+    ... def func3(x):
+    ...     return x
+    ...
+    >>> func3([{"data": "price=10", "id": 1}])
+    [{'data': 'price=10', 'id': 1}]
+    >>> func3([{"data": 10, "id": 2}])
+    [{'data': 10, 'id': 2}]
+    >>> func3([{"data": {"price": 10}, "id": 2}])
+    [{'data': {'price': 10}, 'id': 2}]
+
 
 .. _voluptuous: https://github.com/alecthomas/voluptuous

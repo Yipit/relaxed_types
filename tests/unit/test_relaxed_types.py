@@ -185,7 +185,7 @@ def test_typed_return_with_single_element_tuple():
 
 
 def test_typed_return_with_covariant_dict():
-    decorator = typed_return({})
+    decorator = typed_return(dict)
 
     @decorator
     def valid1():
@@ -229,3 +229,33 @@ def test_typed_return_with_complex_list_type():
     valid2()
     pytest.raises(ReturnTypeError, invalid1)
     pytest.raises(ReturnTypeError, invalid2)
+
+
+def test_typed_return_with_exclusive_dict():
+    decorator = typed_return({"a": int})
+
+    @decorator
+    def valid1():
+        return {"a": 1}
+
+    @decorator
+    def invalid1():
+        return {"a": 1, "b": 2}
+
+    valid1()
+    pytest.raises(ReturnTypeError, invalid1)
+
+
+def test_typed_return_with_inclusive_dict():
+    decorator = typed_return({"a": str, Any: int})
+
+    @decorator
+    def valid1():
+        return {"a": "s", "b": 1}
+
+    @decorator
+    def invalid1():
+        return {"a": "s", "b": "s"}
+
+    valid1()
+    pytest.raises(ReturnTypeError, invalid1)

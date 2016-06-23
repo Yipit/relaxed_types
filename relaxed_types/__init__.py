@@ -23,10 +23,22 @@ def check_type(value, expected_type, outer_value, extra=None):
         if not isinstance(value, dict):
             fail(value, expected_type, outer_value)
 
-        for key_name, key_type in expected_type.items():
-            if key_name not in value:
+        if Any in expected_type:
+            expected = expected_type.copy()
+            unspecified_key_type = expected.pop(Any)
+            for key_name, key_type in expected.items():
+                check_type(value[key_name], key_type, outer_value)
+
+            missing_keys = set(value.keys()) - set(expected.keys())
+            for key_name in missing_keys:
+                check_type(value[key_name], unspecified_key_type, outer_value)
+        else:
+            # all key names must match at this point
+            if set(expected_type.keys()) != set(value.keys()):
                 fail(value, expected_type, outer_value)
-            check_type(value[key_name], key_type, outer_value)
+
+            for key_name, key_type in expected_type.items():
+                check_type(value[key_name], key_type, outer_value)
 
     elif isinstance(expected_type, tuple):
         if not isinstance(value, tuple):
