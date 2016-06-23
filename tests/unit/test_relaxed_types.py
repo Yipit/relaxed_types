@@ -1,7 +1,7 @@
 import pytest
 
 from relaxed_types import typed_return, ReturnTypeError, Any
-from relaxed_types.types import MinLength, Range, Contains, RegExpPattern
+from relaxed_types.types import Range, Contains, RegExpPattern
 
 
 def test_typed_return_with_simple_types():
@@ -278,7 +278,7 @@ def test_typed_return_with_literal_sets():
 
 
 def test_min_length():
-    decorator = typed_return(str, MinLength(10))
+    decorator = typed_return(str, Range(lo=10))
 
     @decorator
     def valid1():
@@ -293,7 +293,7 @@ def test_min_length():
 
 
 def test_multiple_types():
-    decorator = typed_return(str, MinLength(10), Contains('c'))
+    decorator = typed_return(str, Range(10), Contains('c'))
 
     @decorator
     def valid1():

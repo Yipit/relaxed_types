@@ -18,11 +18,7 @@ class custom_type(object):
         return self.__str__()
 
 
-def MinLength(l):
-    return custom_type('MinLength[{}]'.format(l), lambda data: len(data) > l)
-
-
-def Range(lo, hi):
+def Range(lo=float('-inf'), hi=float('+inf')):
     return custom_type('Range[{},{}]'.format(lo, hi), lambda data: lo <= len(data) <= hi)
 
 
