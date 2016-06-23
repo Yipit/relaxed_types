@@ -12,46 +12,59 @@ def check_type(value, expected_type, outer_value, extra=None):
     if expected_type is Any:
         return
     elif isinstance(expected_type, list):
-        if not isinstance(value, list):
-            fail(value, expected_type, outer_value)
-
-        for t in expected_type:
-            for v in value:
-                check_type(v, t, outer_value)
-
+        _check_list(value, expected_type, outer_value)
     elif isinstance(expected_type, dict):
-        if not isinstance(value, dict):
-            fail(value, expected_type, outer_value)
-
-        if Any in expected_type:
-            unspecified_type = expected_type[Any]
-            for key_name in value.keys():
-                check_type(value[key_name], expected_type.get(key_name, unspecified_type), outer_value)
-        else:
-            if set(expected_type.keys()) != set(value.keys()):
-                fail(value, expected_type, outer_value)
-            for key_name in expected_type.keys():
-                check_type(value[key_name], expected_type[key_name], outer_value)
-
+        _check_dict(value, expected_type, outer_value)
     elif isinstance(expected_type, tuple):
-        if not isinstance(value, tuple):
-            fail(value, expected_type, outer_value)
+        _check_tuple(value, expected_type, outer_value)
+    elif inspect.isclass(expected_type):
+        _check_any_type(value, expected_type, outer_value)
+    else:
+        _check_predicate(value, expected_type, outer_value)
 
-        if len(value) != len(expected_type):
-            fail(value, expected_type, outer_value)
+    if extra:
+        _check_predicate(value, extra, outer_value)
 
-        for v, t in zip(value, expected_type):
+
+def _check_any_type(value, expected_type, outer_value):
+    if not isinstance(value, expected_type):
+        fail(value, expected_type, outer_value)
+
+
+def _check_predicate(value, expected_type, outer_value):
+    if not expected_type(value):
+        fail(value, expected_type, outer_value)
+
+
+def _check_tuple(value, expected_type, outer_value):
+    if not isinstance(value, tuple):
+        fail(value, expected_type, outer_value)
+    if len(value) != len(expected_type):
+        fail(value, expected_type, outer_value)
+    for v, t in zip(value, expected_type):
+        check_type(v, t, outer_value)
+
+
+def _check_list(value, expected_type, outer_value):
+    if not isinstance(value, list):
+        fail(value, expected_type, outer_value)
+    for t in expected_type:
+        for v in value:
             check_type(v, t, outer_value)
 
-    elif inspect.isclass(expected_type):
-        if not isinstance(value, expected_type):
-            fail(value, expected_type, outer_value)
+
+def _check_dict(value, expected_type, outer_value):
+    if not isinstance(value, dict):
+        fail(value, expected_type, outer_value)
+    if Any in expected_type:
+        unspecified_type = expected_type[Any]
+        for key_name in value.keys():
+            check_type(value[key_name], expected_type.get(key_name, unspecified_type), outer_value)
     else:
-        if not expected_type(value):
+        if set(expected_type.keys()) != set(value.keys()):
             fail(value, expected_type, outer_value)
-    if extra:
-        if not extra(value):
-            fail(value, expected_type, outer_value)
+        for key_name in expected_type.keys():
+            check_type(value[key_name], expected_type[key_name], outer_value)
 
 
 def typed_return(expected_type, extra=None):
