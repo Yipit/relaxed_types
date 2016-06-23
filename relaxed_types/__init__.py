@@ -8,6 +8,17 @@ import inspect
 Any = object()
 
 
+def typed_return(expected_type, extra=None):
+    def wrapper(fn):
+        @functools.wraps(fn)
+        def newfn(*args, **kw):
+            result = fn(*args, **kw)
+            check_type(result, expected_type, outer_value=result, extra=extra)
+            return result
+        return newfn
+    return wrapper
+
+
 def check_type(value, expected_type, outer_value, extra=None):
     if expected_type is Any:
         return
@@ -28,26 +39,26 @@ def check_type(value, expected_type, outer_value, extra=None):
 
 def _check_any_type(value, expected_type, outer_value):
     if not isinstance(value, expected_type):
-        fail(value, expected_type, outer_value)
+        _fail(value, expected_type, outer_value)
 
 
 def _check_predicate(value, expected_type, outer_value):
     if not expected_type(value):
-        fail(value, expected_type, outer_value)
+        _fail(value, expected_type, outer_value)
 
 
 def _check_tuple(value, expected_type, outer_value):
     if not isinstance(value, tuple):
-        fail(value, expected_type, outer_value)
+        _fail(value, expected_type, outer_value)
     if len(value) != len(expected_type):
-        fail(value, expected_type, outer_value)
+        _fail(value, expected_type, outer_value)
     for v, t in zip(value, expected_type):
         check_type(v, t, outer_value)
 
 
 def _check_list(value, expected_type, outer_value):
     if not isinstance(value, list):
-        fail(value, expected_type, outer_value)
+        _fail(value, expected_type, outer_value)
     for t in expected_type:
         for v in value:
             check_type(v, t, outer_value)
@@ -55,35 +66,24 @@ def _check_list(value, expected_type, outer_value):
 
 def _check_dict(value, expected_type, outer_value):
     if not isinstance(value, dict):
-        fail(value, expected_type, outer_value)
+        _fail(value, expected_type, outer_value)
     if Any in expected_type:
         unspecified_type = expected_type[Any]
         for key_name in value.keys():
             check_type(value[key_name], expected_type.get(key_name, unspecified_type), outer_value)
     else:
         if set(expected_type.keys()) != set(value.keys()):
-            fail(value, expected_type, outer_value)
+            _fail(value, expected_type, outer_value)
         for key_name in expected_type.keys():
             check_type(value[key_name], expected_type[key_name], outer_value)
 
 
-def typed_return(expected_type, extra=None):
-    def wrapper(fn):
-        @functools.wraps(fn)
-        def newfn(*args, **kw):
-            result = fn(*args, **kw)
-            check_type(result, expected_type, outer_value=result, extra=extra)
-            return result
-        return newfn
-    return wrapper
-
-
-def fail(value, expected_type, outer_value):
+def _fail(value, expected_type, outer_value):
     raise ReturnTypeError("Type mismatch for {}, expected {}. Outer value: {}".format(
-        short_repr(value), expected_type, short_repr(outer_value)), value)
+        _short_repr(value), expected_type, _short_repr(outer_value)), value)
 
 
-def short_repr(obj):
+def _short_repr(obj):
     s = repr(obj)
     limit = 1000
     if len(s) > limit:
