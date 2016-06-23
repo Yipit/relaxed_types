@@ -49,16 +49,14 @@ Different from lists, tuples have a fixed size. The tuple specification length h
 
     >>> @typed_return( (str, int) )
     ... def func(v):
-    ...     return v + ('test', 42)
+    ...     return v
     ...
     >>> func( ('hello', 123) )
-    Traceback (most recent call last):
-      ...
-    relaxed_types.ReturnTypeError: Type mismatch for ('hello', 123, 'test', 42), expected (<type 'str'>, <type 'int'>). Outer value: ('hello', 123, 'test', 42)
+    ('hello', 123)
     >>> func( ('hello', 'world') )
     Traceback (most recent call last):
       ...
-    relaxed_types.ReturnTypeError: Type mismatch for ('hello', 'world', 'test', 42), expected (<type 'str'>, <type 'int'>). Outer value: ('hello', 'world', 'test', 42)
+    relaxed_types.ReturnTypeError: Type mismatch for 'world', expected <type 'int'>. Outer value: ('hello', 'world')
 
 
 Sets
