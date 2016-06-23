@@ -28,6 +28,8 @@ def check_type(value, expected_type, outer_value, extra=None):
         _check_dict(value, expected_type, outer_value)
     elif isinstance(expected_type, tuple):
         _check_tuple(value, expected_type, outer_value)
+    elif isinstance(expected_type, set):
+        _check_set(value, expected_type, outer_value)
     elif inspect.isclass(expected_type):
         _check_any_type(value, expected_type, outer_value)
     else:
@@ -58,6 +60,14 @@ def _check_tuple(value, expected_type, outer_value):
 
 def _check_list(value, expected_type, outer_value):
     if not isinstance(value, list):
+        _fail(value, expected_type, outer_value)
+    for t in expected_type:
+        for v in value:
+            check_type(v, t, outer_value)
+
+
+def _check_set(value, expected_type, outer_value):
+    if not isinstance(value, set):
         _fail(value, expected_type, outer_value)
     for t in expected_type:
         for v in value:

@@ -61,6 +61,24 @@ Different from lists, tuples have a fixed size. The tuple specification length h
     relaxed_types.ReturnTypeError: Type mismatch for ('hello', 'world', 'test', 42), expected (<type 'str'>, <type 'int'>). Outer value: ('hello', 'world', 'test', 42)
 
 
+Sets
+++++
+
+Sets behave the same as lists:
+
+
+.. code:: python
+
+    >>> @typed_return({str})
+    ... def func(x):
+    ...     return x.union({"test"})
+    ...
+    >>> func({"a", "b"})
+    set(['a', 'test', 'b'])
+    >>> func({"a", "b", 1, 2, 3})
+    Traceback (most recent call last):
+      ...
+    relaxed_types.ReturnTypeError: Type mismatch for 1, expected <type 'str'>. Outer value: set(['a', 1, 2, 3, 'test', 'b'])
 
 
 Dictionaries

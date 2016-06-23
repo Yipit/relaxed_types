@@ -259,3 +259,18 @@ def test_typed_return_with_inclusive_dict():
 
     valid1()
     pytest.raises(ReturnTypeError, invalid1)
+
+
+def test_typed_return_with_literal_sets():
+    decorator = typed_return({str})
+
+    @decorator
+    def valid1():
+        return {"a", "b"}
+
+    @decorator
+    def invalid1():
+        return {"a", 1.0}
+
+    valid1()
+    pytest.raises(ReturnTypeError, invalid1)
