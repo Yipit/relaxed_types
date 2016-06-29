@@ -6,6 +6,8 @@ This library provides a DSL to do type check in Python. The following is provide
 * ``typed_return``: Decorator used to verify the type of the return value
 * ``check_type``: Checks if a value matches to type and predicate specifications
 * ``Any``: A sentinel object that matches any python object used with ``check_type`` or ``typed_returned``
+* ``Values``: A predicate function that matches the specified values instead of specifications
+* ``Or``: A predicate function that performs ensures that one of the specifications match
 * ``ReturnTypeError``: The exception that ``check_type`` raises if a type check fails
 
 
@@ -159,6 +161,61 @@ Because of predicate support, you can integrate ``relaxed_types`` with other lib
 The only issue with this integration is that it might either raise ``ReturnTypeError`` or
 an exception that inherits from ``voluptuous.errors.Invalid``.
 
+
+Values
+++++++
+
+Predicate function that matches the specified values (not specifications). This is useful to test for literals:
+
+
+.. code:: python
+
+    >>> func(0)
+    0
+    >>> func(1)
+    1
+    >>> func(2)
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+      File "relaxed_types/__init__.py", line 16, in newfn
+        check_type(result, expected_type, outer_value=result, extra=extra)
+      File "relaxed_types/checks.py", line 22, in check_type
+        _check_predicate(value, expected_type, outer_value)
+      File "relaxed_types/checks.py", line 35, in _check_predicate
+        _fail(value, expected_type, outer_value, msg=expected_type.__doc__)
+      File "relaxed_types/checks.py", line 85, in _fail
+        raise ReturnTypeError(msg, value)
+    relaxed_types.exceptions.ReturnTypeError: Expected "2" to be in (0, 1)
+
+
+Or
+++
+
+Predicate function that matches at least one specification:
+
+.. code:: python
+
+    >>> @typed_return(Or(int, float))
+    ... def func(x):
+    ...     return x
+    ...
+    >>> func(1)
+    1
+    >>> func(1.0)
+    1.0
+    >>> func("1")
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+      File "relaxed_types/__init__.py", line 16, in newfn
+        check_type(result, expected_type, outer_value=result, extra=extra)
+      File "relaxed_types/checks.py", line 22, in check_type
+        _check_predicate(value, expected_type, outer_value)
+      File "relaxed_types/checks.py", line 35, in _check_predicate
+        _fail(value, expected_type, outer_value, msg=expected_type.__doc__)
+      File "relaxed_types/checks.py", line 85, in _fail
+        raise ReturnTypeError(msg, value)
+    relaxed_types.exceptions.ReturnTypeError: '1' did not match Or(<type 'int'>, <type 'float'>).
+    More details about the last check: Type mismatch for '1', expected <type 'float'>. Outer value: '1'
 
 
 Combining all together
