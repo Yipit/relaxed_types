@@ -46,7 +46,7 @@ def _check_any_type(value, expected_type, outer_value):
 
 def _check_predicate(value, expected_type, outer_value):
     if not expected_type(value):
-        _fail(value, expected_type, outer_value)
+        _fail(value, expected_type, outer_value, msg=expected_type.__doc__)
 
 
 def _check_tuple(value, expected_type, outer_value):
@@ -88,9 +88,11 @@ def _check_dict(value, expected_type, outer_value):
             check_type(value[key_name], expected_type[key_name], outer_value)
 
 
-def _fail(value, expected_type, outer_value):
-    raise ReturnTypeError("Type mismatch for {}, expected {}. Outer value: {}".format(
-        _short_repr(value), expected_type, _short_repr(outer_value)), value)
+def _fail(value, expected_type, outer_value, msg=None):
+    if msg is None:
+        msg = "Type mismatch for {}, expected {}. Outer value: {}".format(
+            _short_repr(value), expected_type, _short_repr(outer_value))
+    raise ReturnTypeError(msg, value)
 
 
 def _short_repr(obj):

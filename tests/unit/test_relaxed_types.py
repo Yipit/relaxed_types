@@ -274,3 +274,30 @@ def test_typed_return_with_literal_sets():
 
     valid1()
     pytest.raises(ReturnTypeError, invalid1)
+
+
+def test_typed_return_with_verbose_predicate():
+    def pred(x):
+        if x == 10:
+            pred.__doc__ = str("expectation matched.")
+            return True
+        else:
+            pred.__doc__ = str("expected 10, got {}".format(x))
+            return False
+    decorator = typed_return(pred)
+
+    @decorator
+    def valid1():
+        return 10
+
+    @decorator
+    def invalid1():
+        return 0
+
+    valid1()
+    try:
+        invalid1()
+    except ReturnTypeError as e:
+        assert str(e) == "expected 10, got 0"
+    else:
+        assert False, "did not raise ReturnTypeError"
