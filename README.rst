@@ -293,7 +293,7 @@ It's possible to combine lists, tuples, dictionaries, predicates, and any Python
     relaxed_types.ReturnTypeError: Type mismatch for 'test', expected <function <lambda> at 0x10e325758>. Outer value: [{'name': 'test'}]
 
 
-    >>> @typed_return([{"data": Any, "id": lambda x: isinstance(x, int) and x > 0}])
+    >>> @typed_return([{"data": Any, "id": And(int, lambda x: x > 0)}])
     ... def func3(x):
     ...     return x
     ...
