@@ -29,3 +29,20 @@ def Or(*expected_type):
 
     fn.__name__ = fn_name
     return fn
+
+
+def And(*expected_type):
+    fn_name = str('And{}'.format(repr(expected_type)))
+
+    def fn(value):
+        for t in expected_type:
+            try:
+                check_type(value, t, value)
+            except ReturnTypeError as e:
+                fn.__doc__ = '{} did not match {}.\nMore details about the last check: {}'.format(repr(value), fn_name,
+                                                                                                  str(e))
+                return False
+        return True
+
+    fn.__name__ = fn_name
+    return fn

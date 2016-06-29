@@ -8,6 +8,7 @@ This library provides a DSL to do type check in Python. The following is provide
 * ``Any``: A sentinel object that matches any python object used with ``check_type`` or ``typed_returned``
 * ``Values``: A predicate function that matches the specified values instead of specifications
 * ``Or``: A predicate function that performs ensures that one of the specifications match
+* ``And``: A predicate function that performs ensures all specifications match
 * ``ReturnTypeError``: The exception that ``check_type`` raises if a type check fails
 
 
@@ -216,6 +217,33 @@ Predicate function that matches at least one specification:
         raise ReturnTypeError(msg, value)
     relaxed_types.exceptions.ReturnTypeError: '1' did not match Or(<type 'int'>, <type 'float'>).
     More details about the last check: Type mismatch for '1', expected <type 'float'>. Outer value: '1'
+
+
+
+And
++++
+
+Predicate function that matches all specifications:
+
+.. code:: python
+
+    >>> from relaxed_types import *
+    >>> @typed_return({"i": And(int, lambda x: x > 0)})
+    ... def func(x):
+    ...     return {"i": x}
+    ...
+    >>> func(1)
+    {'i': 1}
+    >>> func(1.0)
+    Traceback (most recent call last):
+      ...
+    relaxed_types.exceptions.ReturnTypeError: 1.0 did not match And(<type 'int'>, <function <lambda> at 0x105f7a848>).
+    More details about the last check: Type mismatch for 1.0, expected <type 'int'>. Outer value: 1.0
+    >>> func(-1)
+    Traceback (most recent call last):
+      ...
+    relaxed_types.exceptions.ReturnTypeError: -1 did not match And(<type 'int'>, <function <lambda> at 0x105f7a848>).
+    More details about the last check: Type mismatch for -1, expected <function <lambda> at 0x105f7a848>. Outer value: -1
 
 
 Combining all together
