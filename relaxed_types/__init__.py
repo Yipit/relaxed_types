@@ -82,8 +82,12 @@ def _check_dict(value, expected_type, outer_value):
         for key_name in value.keys():
             check_type(value[key_name], expected_type.get(key_name, unspecified_type), outer_value)
     else:
-        if set(expected_type.keys()) != set(value.keys()):
-            _fail(value, expected_type, outer_value)
+        expected_keys = set(expected_type.keys())
+        value_keys = set(value.keys())
+        if len(expected_keys) > len(value_keys):
+            _fail(value, expected_type, outer_value, msg='Expected keys {} to exist'.format(list(expected_keys - value_keys)))
+        elif len(expected_keys) < len(value_keys):
+            _fail(value, expected_type, outer_value, msg='Did not expect keys {} to exist'.format(list(value_keys - expected_keys)))
         for key_name in expected_type.keys():
             check_type(value[key_name], expected_type[key_name], outer_value)
 
