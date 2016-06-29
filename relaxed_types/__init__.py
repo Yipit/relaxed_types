@@ -132,7 +132,7 @@ def Or(*expected_type):
                 check_type(value, t, value)
             except ReturnTypeError as e:
                 failed = True
-                fn.__doc__ = '{} did not match {}. More details about the last check: {}'.format(repr(value), fn_name, str(e))
+                fn.__doc__ = '{} did not match {}.\nMore details about the last check: {}'.format(repr(value), fn_name, str(e))
             else:
                 failed = False
                 fn.__doc__ = "{} matched {}".format(value, t)

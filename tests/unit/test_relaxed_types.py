@@ -348,7 +348,7 @@ def test_or_predicate():
     try:
         invalid1()
     except ReturnTypeError as e:
-        assert str(e) == """'s' did not match Or(<type 'int'>, <type 'float'>). \
+        assert str(e) == """'s' did not match Or(<type 'int'>, <type 'float'>).
 More details about the last check: Type mismatch for 's', expected <type 'float'>. Outer value: 's'"""
     else:
         assert False, "did not raise ReturnTypeError"
