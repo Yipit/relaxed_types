@@ -112,3 +112,11 @@ class ReturnTypeError(TypeError):
     def __init__(self, msg, value):
         super(ReturnTypeError, self).__init__(msg)
         self.value = value
+
+
+def Values(*values):
+    def fn(value):
+        fn.__doc__ = 'Expected "{}" to be in {}'.format(value, values)
+        return value in values
+    fn.__name__ = str("Values{}".format(repr(values)))
+    return fn

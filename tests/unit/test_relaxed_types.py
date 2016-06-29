@@ -1,6 +1,6 @@
 import pytest
 
-from relaxed_types import typed_return, ReturnTypeError, Any
+from relaxed_types import typed_return, ReturnTypeError, Any, Values
 
 
 def test_typed_return_with_simple_types():
@@ -299,5 +299,30 @@ def test_typed_return_with_verbose_predicate():
         invalid1()
     except ReturnTypeError as e:
         assert str(e) == "expected 10, got 0"
+    else:
+        assert False, "did not raise ReturnTypeError"
+
+
+def test_typed_return_with_static_values():
+    decorator = typed_return(Values(1, 2))
+
+    @decorator
+    def valid1():
+        return 1
+
+    @decorator
+    def valid2():
+        return 2
+
+    @decorator
+    def invalid1():
+        return 3
+
+    valid1()
+    valid2()
+    try:
+        invalid1()
+    except ReturnTypeError as e:
+        assert str(e) == 'Expected "3" to be in (1, 2)'
     else:
         assert False, "did not raise ReturnTypeError"
