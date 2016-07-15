@@ -40,7 +40,7 @@ if __name__ == '__main__':
 
     setup(
         name="relaxed_types",
-        version='0.0.1',
+        version='1.0.0',
         description="relaxed_types",
         long_description=local_file('README.rst'),
         author='Yipit Coders',
