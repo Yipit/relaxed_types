@@ -23,7 +23,7 @@ def Or(*expected_type):
                 fn.__doc__ = '{} did not match {}.\nMore details about the last check: {}'.format(repr(value), fn_name, str(e))
             else:
                 failed = False
-                fn.__doc__ = "{} matched {}".format(value, t)
+                fn.__doc__ = "{} matched {}".format(repr(value), t)
                 break
         return not failed
 
