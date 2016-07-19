@@ -75,8 +75,8 @@ tag:
 publish: tag
 	@if [ -e "$$HOME/.pypirc" ]; then \
 		echo "Uploading to PyPI"; \
-		python setup.py register; \
-		python setup.py sdist upload; \
+		python setup.py register -r pypi; \
+		python setup.py sdist upload -r pypi; \
 	else \
 		echo "You should create a file called '.pypirc' under your home dir."; \
 		echo "That's the right place to configure 'pypi' repos."; \
